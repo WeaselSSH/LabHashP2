@@ -243,10 +243,11 @@ public class PanelPrint extends JPanel {
 
         if (trofeos == null || trofeos.isEmpty()) {
             labelTrophies.setText("Sin trofeos");
-            titlePanel.setVisible(true);
+            removeTrophies();
             showUserInfo();
             return;
         }
+
         labelTrophies.setText("Trofeos");
         removeTrophies();
         for (trofeosAux trofeo : trofeos) {
