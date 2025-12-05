@@ -86,18 +86,32 @@ public class PSNUsers {
     public boolean deactivateUser(String username) throws IOException{
         archivoPSN.seek(0);
        
-        while(archivoPSN.getFilePointer()< archivoPSN.length()){
-            String name= archivoPSN.readUTF();
-            archivoPSN.readInt(); //contador trofeos
-            archivoPSN.readInt(); //contador puntos
-            if(name.equals(username)){
-                archivoPSN.writeBoolean(false);
-                lista.remove(username);
-                return true;
-            }else{
-                archivoPSN.readBoolean();
+        if(userExistence(username)){
+               while(archivoPSN.getFilePointer()< archivoPSN.length()){
+                String name= archivoPSN.readUTF();
+                archivoPSN.readInt(); //contador trofeos
+                archivoPSN.readInt(); //contador puntos
+                if(name.equals(username)){
+                    long posBool = archivoPSN.getFilePointer();
+                    archivoPSN.seek(posBool);
+                    boolean actualstatus = archivoPSN.readBoolean();
+                    if(actualstatus){
+                        archivoPSN.seek(posBool);
+                        archivoPSN.writeBoolean(false);
+                        lista.remove(username);
+                        return true;
+                    }else{
+                        return false;
+                    }
+
+                }else{
+                    archivoPSN.readBoolean();
+                }
             }
         }
+        
+        
+        
         
         return false;        
     }
