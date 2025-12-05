@@ -3,9 +3,16 @@ package HashGui;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import lab7hash.PSNUsers;
+import lab7hash.Trophy;
 
 public class PanelNewTrophy extends JPanel {
+
+    private PSNUsers psn;
 
     private JLabel lblTitle;
 
@@ -21,7 +28,8 @@ public class PanelNewTrophy extends JPanel {
     private JLabel imgPreview;
     private File selectedImageFile;
 
-    public PanelNewTrophy() {
+    public PanelNewTrophy(PSNUsers psn) {
+        this.psn = psn;
 
         setBackground(Color.decode("#0F0F1A"));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -93,6 +101,8 @@ public class PanelNewTrophy extends JPanel {
         add(Box.createVerticalStrut(15));
 
         add(btnAdd);
+        
+        btnAdd.addActionListener(e -> agregarTrofeo());
     }
 
     private JTextField createTextFld(String title) {
@@ -108,5 +118,47 @@ public class PanelNewTrophy extends JPanel {
         ImageIcon icon = new ImageIcon(imgFile.getAbsolutePath());
         Image scaled = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         imgPreview.setIcon(new ImageIcon(scaled));
+    }
+
+    private void agregarTrofeo() {
+        String username = txtUsername.getText();
+        String game = txtGame.getText();
+        String trophyName = txtTrophyName.getText();
+        String tipoTexto = (String) cbType.getSelectedItem();
+
+        if (username.isBlank() || game.isBlank() || trophyName.isBlank()) {
+            JOptionPane.showMessageDialog(this, "Error: complete todos los campos.");
+            return;
+        }
+        if (selectedImageFile == null) {
+            JOptionPane.showMessageDialog(this, "Error: seleccione una imagen.");
+            return;
+        }
+
+        Trophy tipo;
+        tipo = Trophy.valueOf(tipoTexto);
+
+        byte imagenBytes[];
+        try {
+            imagenBytes = Files.readAllBytes(Path.of(selectedImageFile.getAbsolutePath()));
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Error al leer la imagen: " + ex.getMessage());
+            return;
+        }
+
+        try {
+            if (psn.addTrophy(username, game, trophyName, tipo, imagenBytes)) {
+                JOptionPane.showMessageDialog(this, "Trofeo agregado con éxito.");
+                txtUsername.setText("");
+                txtGame.setText("");
+                txtTrophyName.setText("");
+                selectedImageFile = null;
+                imgPreview.setIcon(null);
+            } else {
+                JOptionPane.showMessageDialog(this, "Error: usuario no encontrado.");
+            }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Error al agregar trofeo: " + ex.getMessage());
+        }
     }
 }
