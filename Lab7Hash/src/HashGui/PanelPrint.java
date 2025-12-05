@@ -216,6 +216,7 @@ public class PanelPrint extends JPanel {
         }
 
         userAux u = psnUsers.playerInfo(username);
+        System.out.println("Trofeos: "+u.getcantTrofeos());
         if (u == null) {
             JOptionPane.showMessageDialog(this, "Usuario no encontrado.");
             hideUserInfo();
