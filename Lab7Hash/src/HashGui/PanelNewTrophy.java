@@ -69,14 +69,15 @@ public class PanelNewTrophy extends JPanel {
 
         btnChooseImage.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
-
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("Imágenes (.png, .jpg, .jpeg)",
-                    "png", "jpg", "jpeg");
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                    "Imágenes (.png, .jpg, .jpeg)", "png", "jpg", "jpeg");
             chooser.setFileFilter(filter);
 
-            chooser.showOpenDialog(this);
-            selectedImageFile = chooser.getSelectedFile();
-            mostrarPreview(selectedImageFile);
+            int result = chooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                selectedImageFile = chooser.getSelectedFile();
+                mostrarPreview(selectedImageFile);
+            }
         });
 
         add(lblTitle);
@@ -101,7 +102,7 @@ public class PanelNewTrophy extends JPanel {
         add(Box.createVerticalStrut(15));
 
         add(btnAdd);
-        
+
         btnAdd.addActionListener(e -> agregarTrofeo());
     }
 

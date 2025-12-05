@@ -125,9 +125,15 @@ public class PanelPrint extends JPanel {
         add(scrollTrophies);
 
         btnBuscar.addActionListener(e -> {
+            System.out.println("CLICK buscar");
             try {
                 searchUser();
             } catch (IOException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this,
+                        "Error leyendo archivos: " + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
     }
@@ -216,12 +222,14 @@ public class PanelPrint extends JPanel {
         }
 
         userAux u = psnUsers.playerInfo(username);
-        System.out.println("Trofeos: "+u.getcantTrofeos());
+
         if (u == null) {
             JOptionPane.showMessageDialog(this, "Usuario no encontrado.");
             hideUserInfo();
             return;
         }
+
+        System.out.println("Trofeos: " + u.getcantTrofeos());
 
         boolean activo = u.isActivo();
         if (!activo) {
@@ -235,10 +243,11 @@ public class PanelPrint extends JPanel {
 
         if (trofeos == null || trofeos.isEmpty()) {
             labelTrophies.setText("Sin trofeos");
-            titlePanel.setVisible(true);
+            removeTrophies();
             showUserInfo();
             return;
         }
+
         labelTrophies.setText("Trofeos");
         removeTrophies();
         for (trofeosAux trofeo : trofeos) {
