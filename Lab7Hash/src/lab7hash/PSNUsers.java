@@ -87,6 +87,25 @@ public class PSNUsers {
         archivoPSN.seek(0);
        
         if(userExistence(username)){
+            long posUser=lista.search(username);
+            archivoPSN.seek(posUser);
+            
+            String name= archivoPSN.readUTF();
+            archivoPSN.readInt(); //contador trofeos
+            archivoPSN.readInt(); //contador puntos
+            
+            long posBool = archivoPSN.getFilePointer();
+            archivoPSN.seek(posBool);
+            boolean actualstatus = archivoPSN.readBoolean();
+            if(actualstatus){
+                archivoPSN.seek(posBool);
+                archivoPSN.writeBoolean(false);
+                lista.remove(username);
+                return true;
+            }else{
+                return false;
+            }   
+            /*
                while(archivoPSN.getFilePointer()< archivoPSN.length()){
                 String name= archivoPSN.readUTF();
                 archivoPSN.readInt(); //contador trofeos
@@ -108,11 +127,8 @@ public class PSNUsers {
                     archivoPSN.readBoolean();
                 }
             }
+*/
         }
-        
-        
-        
-        
         return false;        
     }
     
@@ -152,9 +168,20 @@ public class PSNUsers {
     
     
     public userAux playerInfo(String username) throws IOException {
-         String infoPlayer="---INFORMACION DE JUGADOR---";
         if(userExistence(username)){
              archivoPSN.seek(0);
+             
+            long posUser=lista.search(username);
+            archivoPSN.seek(posUser);
+            String name =archivoPSN.readUTF();
+            int cantTrophies = archivoPSN.readInt();;
+            int cantPts= archivoPSN.readInt();
+            boolean statUser = archivoPSN.readBoolean();
+
+            userAux userInfo = new userAux(name,cantTrophies, cantPts, statUser);
+            addTrophiesUser(userInfo, username);
+            return userInfo;           
+             /*
              while(archivoPSN.getFilePointer()< archivoPSN.length()){
                  String name =archivoPSN.readUTF();
                  if(name.equals(username)){
@@ -171,11 +198,8 @@ public class PSNUsers {
                  archivoPSN.readInt();
                  archivoPSN.readBoolean();
              }
-            
-            
+*/
         }
-        
-        
         return null;
     }
     
