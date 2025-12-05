@@ -44,6 +44,10 @@ public class userAux {
         return userTrophies;
     }
     
+    public boolean isActivo(){
+        return estado;
+    }
+    
     public void addTrophy(trofeosAux trophy){
         userTrophies.add(trophy);
     }

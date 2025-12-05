@@ -2,6 +2,11 @@ package HashGui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import lab7hash.PSNUsers;
+import lab7hash.trofeosAux;
+import lab7hash.userAux;
 
 public class PanelPrint extends JPanel {
 
@@ -15,9 +20,16 @@ public class PanelPrint extends JPanel {
 
     private JPanel trophiesContainer;
     private JScrollPane scrollTrophies;
-    
+
     private JPanel titlePanel;
-    public PanelPrint() {
+    private JLabel labelTrophies;
+
+    private PSNUsers psnUsers;
+
+    public PanelPrint(PSNUsers psnUsers) {
+
+        this.psnUsers = psnUsers;
+
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
         setBackground(Color.decode("#0F0F1A"));
@@ -96,7 +108,7 @@ public class PanelPrint extends JPanel {
         titlePanel = new JPanel(new BorderLayout());
         titlePanel.setBackground(Color.decode("#0F0F1A"));
 
-        JLabel labelTrophies = new JLabel("Trofeos del jugador");
+        labelTrophies = new JLabel("Trofeos del jugador");
         labelTrophies.setFont(new Font("Arial", Font.PLAIN, 13));
         labelTrophies.setForeground(Color.WHITE);
         labelTrophies.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -111,6 +123,13 @@ public class PanelPrint extends JPanel {
         add(titlePanel);
         add(Box.createVerticalStrut(15));
         add(scrollTrophies);
+
+        btnBuscar.addActionListener(e -> {
+            try {
+                searchUser();
+            } catch (IOException ex) {
+            }
+        });
     }
 
     public void showUserInfo() {
@@ -185,5 +204,55 @@ public class PanelPrint extends JPanel {
 
         trophiesContainer.revalidate();
         trophiesContainer.repaint();
+    }
+
+    private void searchUser() throws IOException {
+        String username = txtBuscar.getText().trim();
+
+        if (username.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Ingrese un username antes.");
+            hideUserInfo();
+            return;
+        }
+
+        userAux u = psnUsers.playerInfo(username);
+        if (u == null) {
+            JOptionPane.showMessageDialog(this, "Usuario no encontrado.");
+            hideUserInfo();
+            return;
+        }
+
+        boolean activo = u.isActivo();
+        if (!activo) {
+            JOptionPane.showMessageDialog(this, "Usuario inactivo");
+            hideUserInfo();
+            return;
+        }
+
+        setUserInfo(u.getName(), u.getPuntos(), u.getcantTrofeos(), activo);
+        ArrayList<trofeosAux> trofeos = u.getrofeos();
+
+        if (trofeos == null || trofeos.isEmpty()) {
+            labelTrophies.setText("Sin trofeos");
+            titlePanel.setVisible(true);
+            showUserInfo();
+            return;
+        }
+        labelTrophies.setText("Trofeos");
+        removeTrophies();
+        for (trofeosAux trofeo : trofeos) {
+
+            byte[] imgBytes = trofeo.getbytesImag();
+            ImageIcon icon = null;
+
+            if (imgBytes != null && imgBytes.length > 0) {
+                icon = new ImageIcon(imgBytes);
+            }
+
+            agregarTrofeo(trofeo.getfecha(), trofeo.getTipo(), trofeo.getnomjuego(),
+                    trofeo.getnomtrofeo(), icon
+            );
+        }
+        showUserInfo();
     }
 }
