@@ -173,6 +173,7 @@ public class PSNUsers {
              
             long posUser=lista.search(username);
             archivoPSN.seek(posUser);
+            
             String name =archivoPSN.readUTF();
             int cantTrophies = archivoPSN.readInt();;
             int cantPts= archivoPSN.readInt();
@@ -237,6 +238,28 @@ public class PSNUsers {
     
     private void  actualizarPuntaje(String username, int puntos) throws IOException{
          archivoPSN.seek(0);
+         
+         long posUser=lista.search(username);
+         archivoPSN.seek(posUser);
+         archivoPSN.readUTF();
+         
+         long posTrophies = archivoPSN.getFilePointer(); //posicion de trofeos
+         archivoPSN.seek(posTrophies);
+         int cantT= archivoPSN.readInt();
+         archivoPSN.seek(posTrophies);
+         archivoPSN.writeInt((cantT+1));//actualizar cant trofeos
+
+
+         //ACtualizar puntaje
+         long posPTS = archivoPSN.getFilePointer();//posicion de puntos
+         archivoPSN.seek(posPTS);
+         int points= archivoPSN.readInt();
+         int newCant =points+puntos;
+         archivoPSN.seek(posPTS);
+         archivoPSN.writeInt(newCant);//actualiza los puntos
+         
+         
+         /*
          while(archivoPSN.getFilePointer()< archivoPSN.length()){
              if(archivoPSN.readUTF().equals(username)){
                  //actualizar cantidad de trofeos
@@ -262,6 +285,7 @@ public class PSNUsers {
              archivoPSN.readInt();
              archivoPSN.readBoolean();
          }
+*/
     }
     
     
